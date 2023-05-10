@@ -27,7 +27,7 @@ AsyncWebSocket websocket("/ws");
 
 void setup()
 {
-  pinMode(2, OUTPUT);
+  pinMode(LED_PIN, OUTPUT);
   Serial.begin(115200);
   WiFi.disconnect();   // added to start with the wifi off, avoid crashing
   WiFi.mode(WIFI_OFF); // added to start with the wifi off, avoid crashing

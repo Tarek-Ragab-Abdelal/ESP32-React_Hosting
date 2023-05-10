@@ -33,7 +33,7 @@ void wsEventHandler(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEve
       return;
     // get the target LED state
     bool led = recievedJson["LED"];
-    digitalWrite(2, led);
+    digitalWrite(LED_PIN, led);
     // send ACK
     client->text(dataBuffer, len);
     // alert all other clients
