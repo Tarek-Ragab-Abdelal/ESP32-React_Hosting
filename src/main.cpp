@@ -8,12 +8,20 @@
 // #define AP_MODE
 #define STA_MODE
 
-#define SSID "ESP32 SoftAP" // This is the SSID that ESP32 will broadcast
-#define PASSWORD "12345678" // password should be atleast 8 characters to make it work
+#define SSID "Orange-Ragab Abdelal" // This is the SSID that ESP32 will broadcast
+#define PASSWORD "Suzan712@66.com"  // password should be atleast 8 characters to make it work
 
+#ifdef AP_MODE
 const IPAddress apIP(192, 168, 2, 1);
-const IPAddress gateway(255, 255, 255, 0);
-
+const IPAddress gateway(192, 168, 1, 1);
+#else
+IPAddress local_IP(192, 168, 1, 184);
+// Set your Gateway IP address
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 0, 0);
+IPAddress primaryDNS(8, 8, 8, 8);   // optional
+IPAddress secondaryDNS(8, 8, 4, 4); // optional
+#endif
 AsyncWebServer server(80);
 AsyncWebSocket websocket("/ws");
 
@@ -21,15 +29,11 @@ void setup()
 {
   pinMode(2, OUTPUT);
   Serial.begin(115200);
-#ifdef AP_MODE
   WiFi.disconnect();   // added to start with the wifi off, avoid crashing
   WiFi.mode(WIFI_OFF); // added to start with the wifi off, avoid crashing
+#ifdef AP_MODE
   WiFi.mode(WIFI_AP);
-#ifndef PASSWORD
-  WiFi.softAP(SSID);
-#else
   WiFi.softAP(SSID, PASSWORD);
-#endif
   WiFi.softAPConfig(apIP, apIP, gateway);
   Serial.println("");
   Serial.println("WiFi AP is now running");
@@ -37,6 +41,10 @@ void setup()
   Serial.println(WiFi.softAPIP());
 #else
   WiFi.mode(WIFI_STA);
+  if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS))
+  {
+    Serial.println("STA Failed to configure");
+  }
   WiFi.begin(SSID, PASSWORD);
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -56,54 +64,41 @@ void setup()
   // bind websocket to async web server
   websocket.onEvent(wsEventHandler);
   server.addHandler(&websocket);
-
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-#ifdef VERBOSE
               Serial.println("Serving file:  /index.html");
-#endif
               AsyncWebServerResponse *response = request->beginResponse(LITTLEFS, "/index.html", "text/html");
               response->addHeader("Content-Encoding", "gzip");
               request->send(response); });
 
-  File root = LITTLEFS.open("/");
-  while (File file = root.openNextFile())
-  {
-    String filename = file.name();
-    server.on(filename.c_str(), HTTP_GET, [filename](AsyncWebServerRequest *request)
-              {
-#ifdef VERBOSE
-                Serial.println("Serving file: " + filename);
-#endif
-                //
-                String contentType = filename.substring(filename.length() - 3);
-                if (contentType == "tml" || contentType == "htm")
-                  contentType = "text/html";
-                else if (contentType == "css")
-                  contentType = "text/css";
-                else if (contentType == ".js")
-                  contentType = "text/javascript";
-                else if (contentType == "son")
-                  contentType = "application/json";
-                else if (contentType == "jpg" || contentType == "peg")
-                  contentType = "image/jpeg";
-                else if (contentType == "png")
-                  contentType = "image/png";
-                else if (contentType == "svg")
-                  contentType = "image/svg+xml";
-                else if (contentType == "ttf")
-                  contentType = "application/x-font-truetype";
-                else if (contentType == "otf")
-                  contentType = "application/x-font-opentype";
-                else
-                  contentType = "text/plain";
-                AsyncWebServerResponse *response = request->beginResponse(LITTLEFS, filename, contentType);
-                response->addHeader("Content-Encoding", "gzip");
-                request->send(response); });
-  }
-  // Captive portal to keep the client
+  server.on("/main.js", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              Serial.println("Serving file:  /main.js");
+              AsyncWebServerResponse *response = request->beginResponse(LITTLEFS, "/main.js", "text/javascript");
+              response->addHeader("Content-Encoding", "gzip");
+              request->send(response); });
+
+  server.on("/main.css", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              Serial.println("Serving file:  /main.css");
+              AsyncWebServerResponse *response = request->beginResponse(LITTLEFS, "/main.css", "text/css");
+              response->addHeader("Content-Encoding", "gzip");
+              request->send(response); });
+
+  server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request)
+            {
+              Serial.println("Serving file:  /favicon.icon");
+              AsyncWebServerResponse *response = request->beginResponse(LITTLEFS, "/favicon.ico", "text/javascript");
+              response->addHeader("Content-Encoding", "gzip");
+              request->send(response); });
+
+#ifdef AP_MODE
   server.on("*", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->redirect("http://" + apIP.toString()); });
+#else
+  server.on("*", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->redirect("http://" + WiFi.localIP().toString()); });
+#endif
   server.begin();
 
   Serial.println("Server Started");

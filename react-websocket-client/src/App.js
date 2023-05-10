@@ -1,17 +1,15 @@
 import './App.css';
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import React, { useState, useEffect, useRef } from 'react';
-import Button from '@mui/material/Button';
 
 function App() {
   const websocket = useRef(null);
   const [LED, setLED] = useState(false);
 
   useEffect(() => {
-    websocket.current = new W3CWebSocket('ws://192.168.2.1/ws');
+    websocket.current = new W3CWebSocket('ws://192.168.1.184/ws');
     websocket.current.onmessage = (message) => {
       const dataFromServer = JSON.parse(message.data);
-      // console.log('got reply! ', dataFromServer);
       if (dataFromServer.type === "message") {
         setLED(dataFromServer.LED)
       }
@@ -35,17 +33,16 @@ function App() {
     sendUpdate({ led: false });
   }
 
-
   return (
     <div className='body'>
       <div className="centered">
         <div align="center">
-          <h3>Project Demo</h3>
-          <h1>Currently {LED ? "ON" : "OFF"}</h1>
-          <button variant="contained" onClick={LED ? LEDoff : LEDon}>
+        <h1 align = "center">ESP32 React app hosting Demo</h1>
+          <h3>Currently {LED ? "ON" : "OFF"}</h3>
+          <button variant="contained" onClick={LEDon}>
             ON
           </button>
-          <button onClick={LED ? LEDoff : LEDon}>
+          <button onClick={LEDoff }>
             OFF
           </button>
         </div>
