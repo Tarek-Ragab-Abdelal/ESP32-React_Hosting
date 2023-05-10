@@ -18,9 +18,10 @@
    - Windows_amd64
    - Windows_i386
 
-## Proceudres of Uploading to ESP32
+## Proceudres of running the project
 
-1. Upload the code
+1. Go to "src/main.cpp" and edit the defined SSID and Password to yours.
+2. Upload the code
    - Platform IO -> Project Tasks -> esp32dev -> General -> Upload
-2. Upload the React Web App
+3. Upload the React Web App
    - Platform IO -> Project Tasks -> esp32dev -> Platform -> Upload Filesystem Image
