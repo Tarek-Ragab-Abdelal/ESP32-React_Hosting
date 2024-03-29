@@ -25,3 +25,9 @@
    - Platform IO -> Project Tasks -> esp32dev -> General -> Upload
 3. Upload the React Web App
    - Platform IO -> Project Tasks -> esp32dev -> Platform -> Upload Filesystem Image
+  
+
+### Support Me
+
+<p style="display: inline-block; margin-right: 0.25rem;"><a style="padding: 10px;" href="https://www.buymeacoffee.com/tarekragab"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" width="150"/></a>
+<a style="padding: 10px;" href="https://www.ko-fi.com/tarekragab"><img src="https://storage.ko-fi.com/cdn/kofi2.png?v=3" width="150"/></a></p>
